@@ -4,20 +4,31 @@ import Image from "next/image";
 import { getPost } from "@/lib/data";
 // import { Suspense } from "react/cjs/react.production.min";
 
-// const getData = async (slug) => {
-//   const res = await fetch(`https://jsonplaceholder.typicode.com/posts/${slug}`);
+const getData = async (slug) => {
+  const res = await fetch(`http://localhost:3000/api/blog/${slug}`);
 
-//   if (!res.ok) {
-//     throw new Error("Something went wrong");
-//   }
+  if (!res.ok) {
+    throw new Error("Something went wrong");
+  }
 
-//   return res.json();
-// };
+  return res.json();
+};
+
+export const generateMetadata = async ({ params }) => {
+  const { slug } = params;
+
+  const post = await getPost(slug);
+
+  return {
+    title: post.title,
+    description: post.desc,
+  };
+};
 
 const SinglePostPage = async ({ params }) => {
   const { slug } = params;
-  // const post = await getData(slug);
-  const post = await getPost(slug);
+  const post = await getData(slug);
+  // const post = await getPost(slug);
 
   return (
     <div className={styles.container}>
@@ -34,13 +45,6 @@ const SinglePostPage = async ({ params }) => {
       <div className={styles.textContainer}>
         <h1 className={styles.title}>{post?.title}</h1>
         <div className={styles.detail}>
-          <Image
-            src="/noavatar.png"
-            alt=""
-            width={50}
-            height={50}
-            className={styles.avatar}
-          />
           {/* <Suspense fallback={<div>Loading...</div>}> */}
           {post && <PostUser userId={post.userId} />}
           {/* </Suspense> */}
